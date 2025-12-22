@@ -1,6 +1,7 @@
 // import { useState } from "react";
 
 import "./App.css";
+import Board from "./components/Board";
 import Newgame from "./components/Newgame";
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
   return (
     <div className="flex justify-center items-center ">
       <Newgame />
+      {/* <Board /> */}
     </div>
   );
 }
