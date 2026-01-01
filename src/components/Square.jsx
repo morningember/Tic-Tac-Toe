@@ -1,12 +1,8 @@
-import React, { useState } from "react";
 import xIcon from "../assets/icon-x.svg";
 import oIcon from "../assets/icon-o.svg";
-import xIconOutline from "../assets/icon-x-outline.svg";
-import oIconOutline from "../assets/icon-o-outline.svg";
 
-const Square = ({ value, onsquareClick, hover, player }) => {
+const Square = ({ value, onsquareClick, hover, player1 }) => {
   // const [xIsNext, setXIsNext] = useState(true);
-  const [currentPlayer, setCurrentPlayer] = useState("O");
 
   return (
     <div className="">
@@ -19,7 +15,7 @@ const Square = ({ value, onsquareClick, hover, player }) => {
         {value === "X" && <img src={xIcon} />}
         {value === "O" && <img src={oIcon} />}
 
-        {value === null && hover(player)}
+        {value === null && hover(player1)}
       </div>
     </div>
   );

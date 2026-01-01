@@ -5,7 +5,7 @@ import Board from "./components/Board";
 import Newgame from "./components/Newgame";
 
 function App() {
-  // const [count, setCount] = useState(0);
+  // const [showBoard, setShowBoard] = useState(true);
 
   return (
     <div className="flex justify-center items-center ">
