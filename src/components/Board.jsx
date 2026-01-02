@@ -11,7 +11,6 @@ import { useEffect } from "react";
 const Board = ({ p1, p2, player1, computer, isComputer, mark }) => {
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
-  // const [player1, setplayer1] = useState("X");
   const [restart, setRestart] = useState(false);
   const [xScore, setXScore] = useState(0);
   const [OScore, setOScore] = useState(0);
@@ -19,6 +18,7 @@ const Board = ({ p1, p2, player1, computer, isComputer, mark }) => {
   const [isQuit, setIsQuit] = useState(false);
   // const computerSymbol = player1 === "X" ? "O" : "X";
   // RESTART
+
   function restartRound() {
     setSquares(() => Array(9).fill(null));
     setXIsNext(true);
@@ -80,45 +80,90 @@ const Board = ({ p1, p2, player1, computer, isComputer, mark }) => {
     <img src={oIcon} className="w-4 h-4" />
   );
 
-  function getWinnerMessage(player1, winner) {
+  function getWinnerMessage(player1, winner, computer) {
     if (!winner) return null;
 
-    return winner === player1 ? "player 1 wins" : "Player 2 Wins";
+    if (computer) {
+      return winner === player1 ? "You won!" : "Oh no, you lost...";
+    } else {
+      return winner === player1 ? "player 1 wins" : "Player 2 Wins";
+    }
   }
 
   function handleClick(i) {
+    setHoverState(player1);
     if (squares[i] || calculateWinner(squares)) {
       return;
     }
     const nextSquares = squares.slice();
+    if (computer) {
+      nextSquares[i] = player1;
 
-    nextSquares[i] = player1;
-
-    setSquares(nextSquares);
-    setXIsNext(player1 === "X" ? false : true);
-    setHoverState(player1);
-    if (computer === true && !winner) {
+      setSquares(nextSquares);
+      setXIsNext(player1 === "X" ? false : true);
       setTimeout(() => computerMove(nextSquares), 500);
+    } else {
+      nextSquares[i] = xIsNext ? "X" : "O";
+      setSquares(nextSquares);
+      setXIsNext(!xIsNext);
+    }
+  }
+  function minimax(squares, depth, isMaximizing) {
+    const winner = calculateWinner(squares);
+    if (winner === isComputer) return 10 - depth;
+    if (winner === player1) return depth - 10;
+    if (!squares.includes(null)) return 0;
+
+    if (isMaximizing) {
+      let bestScore = -Infinity;
+
+      for (let i = 0; i < squares.length; i++) {
+        if (squares[i] === null) {
+          squares[i] = isComputer;
+          const score = minimax(squares, depth + 1, false);
+          squares[i] = null;
+          bestScore = Math.max(score, bestScore);
+        }
+      }
+      return bestScore;
+    } else {
+      let bestScore = Infinity;
+      for (let i = 0; i < squares.length; i++) {
+        if (squares[i] === null) {
+          squares[i] = player1;
+          const score = minimax(squares, depth + 1, true);
+          squares[i] = null;
+          bestScore = Math.min(score, bestScore);
+        }
+      }
+      return bestScore;
     }
   }
 
-  function computerMove(nextSquares) {
-    const emptySquares = nextSquares
-      .map((val, index) => (val === null ? index : null))
-      .filter((val) => val !== null);
-    if (emptySquares.length === 0) return;
-    const randomIndex =
-      emptySquares[Math.floor(Math.random() * emptySquares.length)];
+  function computerMove(squares) {
+    let bestScore = -Infinity;
+    let bestMove;
 
-    const newSquares = [...nextSquares];
-    newSquares[randomIndex] = isComputer;
+    for (let i = 0; i < squares.length; i++) {
+      if (squares[i] === null) {
+        squares[i] = isComputer;
+        const score = minimax(squares, 0, false);
+        squares[i] = null;
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = i;
+        }
+      }
+    }
+    const newSquares = [...squares];
+    newSquares[bestMove] = isComputer;
 
-    setXIsNext(player1 === "X");
     setSquares(newSquares);
+    setXIsNext(player1 === "X");
   }
 
   useEffect(() => {
-    if (xIsNext && mark === "O") {
+    if (computer && xIsNext && mark === "O") {
       setTimeout(() => computerMove(squares), 500);
     }
   }, [xIsNext, squares]);
@@ -148,22 +193,22 @@ const Board = ({ p1, p2, player1, computer, isComputer, mark }) => {
     );
   }
   return (
-    <div className="">
+    <div className=" ">
       {!isQuit && (
-        <div className="w-82 h-129.5 mt-6 mx-auto items-center">
+        <div className="w-82 h-129.5 md:w-115 md:h-155.75 mt-6 mx-auto flex flex-col md:mt-50">
           <div className="">
-            <div className="flex flex-row justify-between items-center w-82 h-10">
-              <div className="w-18 h-10">
+            <div className="flex flex-row justify-between items-center md:w-114.25 md:h-13">
+              <div className="w-18 h-10 md:h-8">
                 <img src={Logo} alt="" />
               </div>
 
-              <div className="flex items-center justify-center gap-3 p-2.5 bg-(--semi-dark-navy) shadow-[inset_0px_-4px_0px_#10212a] w-24 rounded-[5px]">
+              <div className="flex items-center justify-center gap-3 p-2.5 bg-(--semi-dark-navy) shadow-[inset_0px_-4px_0px_#10212a] w-24 md:h-13 rounded-[5px]">
                 {status}
                 <span className="text-(--silver) text-[14px] font-bold">
                   Turn
                 </span>
               </div>
-              <div className="bg-(--silver) w-10 h-10 flex justify-center items-center shadow-[inset_0px_-4px_0px_#10212a] rounded-[5px]">
+              <div className="bg-(--silver) w-10 h-10 md:w-13 md:h-13 flex justify-center items-center shadow-[inset_0px_-4px_0px_#10212a] rounded-[5px]">
                 <svg
                   width="20"
                   height="20"
@@ -181,7 +226,7 @@ const Board = ({ p1, p2, player1, computer, isComputer, mark }) => {
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-5 w-82 h-82 mt-6 ">
+          <div className="flex flex-wrap gap-5 w-82 h-82 md:w-115 md:h-115.25 mt-6 ">
             <Square
               value={squares[0]}
               status={xIsNext}
@@ -246,16 +291,16 @@ const Board = ({ p1, p2, player1, computer, isComputer, mark }) => {
               onsquareClick={() => handleClick(8)}
             />
           </div>
-          <div className="flex items-center justify-center gap-5 w-82 mt-5 text-(--dark-navy) ">
-            <div className="bg-(--light-blue) flex flex-col  justify-center items-center h-16 w-24 uppercase rounded-[15px] shadow-[1px_10px_4px_#10212a]">
+          <div className="flex items-center justify-center gap-5 w-82 md:w-114.75 md:h-18 mt-5 text-(--dark-navy) ">
+            <div className="bg-(--light-blue) flex flex-col  justify-center items-center h-16 w-24 md:w-35 md:h-18 uppercase rounded-[15px] shadow-[1px_10px_4px_#10212a]">
               {p1}
               <span className="font-black text-[20px]">{xScore}</span>
             </div>
-            <div className="bg-(--silver) flex flex-col justify-center items-center h-16 w-24 uppercase rounded-[15px] shadow-[1px_10px_4px_#10212a]">
+            <div className="bg-(--silver) flex flex-col justify-center items-center h-16 w-24 md:w-35 md:h-18 uppercase rounded-[15px] shadow-[1px_10px_4px_#10212a]">
               Ties
               <span className="font-black text-[20px]">{tiesScore}</span>
             </div>
-            <div className="bg-(--light-yellow) flex flex-col justify-center items-center h-16 w-24 uppercase rounded-[15px] shadow-[1px_10px_4px_#10212a]">
+            <div className="bg-(--light-yellow) flex flex-col justify-center items-center h-16 w-24 md:w-35 md:h-18 uppercase rounded-[15px] shadow-[1px_10px_4px_#10212a]">
               {p2}
               <span className="font-black text-[20px]">{OScore}</span>
             </div>
@@ -265,8 +310,8 @@ const Board = ({ p1, p2, player1, computer, isComputer, mark }) => {
             <div className="absolute top-0 bottom-0 left-0 right-0 bg-[rgba(0,0,0,0.5)] w-full h-full">
               <div className="absolute bg-(--semi-dark-navy) w-full h-57 top-[26%] left-0 right-0 bottom-0 ">
                 <div className="flex flex-col justify-center items-center text-(--silver) w-70 h-35 mx-auto mt-10">
-                  <p className="uppercase text-[14px] mb-5">
-                    {getWinnerMessage(player1, winner)}
+                  <p className="uppercase text-[14px] font-bold mb-5">
+                    {getWinnerMessage(player1, winner, computer)}
                   </p>
                   <div className="flex gap-2">
                     {winner === "X" && (

@@ -21,6 +21,7 @@ const Newgame = () => {
   // VRS PLAYER
 
   function vsPlayer() {
+    setComputer(false);
     setShowBoard(true);
   }
 
@@ -46,7 +47,7 @@ const Newgame = () => {
   return (
     <div className="">
       {!showBoard && (
-        <div className="w-81.75 h-107.25 mb-50 flex flex-col justify-center items-center ">
+        <div className="w-81.75 h-107.25 md:w-115 md:h-117.75 lg:w-115.25 lg:h-117.75 mb-50 flex flex-col justify-center items-center mt-10 ">
           {/* LOGO */}
           <div className="mt-30 mb-10 ">
             <img src={Logo} alt="logo" />
@@ -56,9 +57,9 @@ const Newgame = () => {
             <p className="uppercase text-center text-(--silver) font-bold m-4">
               Pick player 1's mark
             </p>
-            <div className=" flex justify-center items-center bg-(--dark-navy) w-69.75 h-18 rounded-[10px]">
+            <div className=" flex justify-center items-center bg-(--dark-navy) w-69.75 h-18 md:w-103  md:h-18 rounded-[10px]">
               <div
-                className={`rounded-[10px] w-33 h-13.5 ${
+                className={`rounded-[10px] w-33 h-13.5 md:w-49.5 md:h-13.5 mx-auto ${
                   mark === "X" ? "bg-(--silver)" : ""
                 }`}
                 onClick={() => {
@@ -83,7 +84,7 @@ const Newgame = () => {
                 </svg>
               </div>
               <div
-                className={`rounded-[10px] w-33 h-13.5 mx-auto ${
+                className={`rounded-[10px] w-33 h-13.5 md:w-49.5 md:h-13.5 mx-auto ${
                   mark === "O" ? "bg-(--silver)" : ""
                 }`}
                 onClick={() => {
